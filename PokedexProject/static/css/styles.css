@@ -1,0 +1,54 @@
+body {
+	background-color: red;
+}
+
+.pokedex-main {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+}
+
+.table {
+	background-color: white;
+	border: 2px solid black;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 15px;
+}
+
+.header {
+	position: sticky;
+	top: 0;
+	height: 60px;
+}
+
+.cell-header {
+	font-weight: bold;
+	background-color: lightgray;
+	border-bottom: 1px solid black;
+	width: 150px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.row {
+	display: flex;
+}
+
+.cell {
+	border-bottom: 1px solid black;
+	width: 150px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.load-button {
+	border: none;
+	border-radius: 50%;
+	padding: 25px;
+	margin-bottom: 30px;
+}

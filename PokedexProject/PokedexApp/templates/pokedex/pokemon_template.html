@@ -1,0 +1,10 @@
+{% for pokemon_name, pokemon_data in pokemons.items %}
+<div class="row">
+	<div class="cell"><img src="{{pokemon_data.sprite}}" alt="{{pokemon_name | capfirst}}"></div>
+	<div class="cell">{{pokemon_data.id}}</div>
+	<div class="cell">{{pokemon_name | capfirst}}</div>
+	<div class="cell">{{pokemon_data.types | join:", " }}</div>
+	<div class="cell">{{pokemon_data.height}} cm</div>
+	<div class="cell">{{pokemon_data.weight}} kg</div>
+</div>
+{% endfor %}
