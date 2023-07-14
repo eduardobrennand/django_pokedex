@@ -3,29 +3,31 @@ import requests
 import json
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-
+from django.core.cache import cache
 
 def index(request):
     """Pokedex index."""
+    cache_key = 'pokedex_data'
+    cached_data = cache.get(cache_key)
+
+    if cached_data is not None:
+    	return render(request, 'pokedex/index.html', cached_data)
+
     url_pokeapi = ("https://pokeapi.co/api/v2/pokemon?limit=20&offset=0")
 
     r = requests.get(url_pokeapi).json()
 
     next_r = r['next']
+    pokemons_results = r['results']
+    pokemons_urls = [p['url'] for p in pokemons_results]
 
-    pokemons = r['results']
+    pokemons = {}
 
-    pokemons_urls = []
-
-    for p in pokemons:
-        pokemons_urls.append(p['url'])
-
-    poke = {}
+    session = requests.Session()
 
     for url in pokemons_urls:
-        url_pokemon = url
-        r = requests.get(url_pokemon).json()
-        poke[r['name']] = {
+        r = session.get(url).json()
+        pokemons[r['name']] = {
             'id': r['id'],
             'height': r['height'],
             'weight': int(r['weight'])/10,
@@ -34,49 +36,48 @@ def index(request):
         }
 
     context = {
-        'pokemons': poke,
+        'pokemons': pokemons,
         'next': next_r
     }
+
+    cache.set(cache_key, context, timeout=3600)
 
     return render(request, 'pokedex/index.html', context)
 
-
 def load_pokemons(request):
-    """Ajax requisition to load 20 more pokemons."""
     url_pokeapi = request.GET.get('url')
+    cached_data = cache.get(url_pokeapi)
 
-    r = requests.get(url_pokeapi).json()
+    if cached_data:
+        ajax_data = cached_data
+    else:
+        r = requests.get(url_pokeapi).json()
+        next_r = r['next']
+        pokemons_results = r['results']
+        pokemons_urls = [p['url'] for p in pokemons_results]
 
-    next_r = r['next']
+        pokemons = {}
 
-    pokemons = r['results']
+        session = requests.Session()
 
-    pokemons_urls = []
-
-    for p in pokemons:
-        pokemons_urls.append(p['url'])
-
-    poke = {}
-
-    for url in pokemons_urls:
-        url_pokemon = url
-        r = requests.get(url_pokemon).json()
-        poke[r['name']] = {
-            'id': r['id'],
-            'height': r['height'],
-            'weight': int(r['weight'])/10,
-            'sprite': r['sprites']['front_default'],
-            'types': [t['type']['name'] for t in r['types']]
+        for url in pokemons_urls:
+        	r = session.get(url).json()
+        	pokemons[r['name']] = {
+	            'id': r['id'],
+	            'height': r['height'],
+	            'weight': int(r['weight'])/10,
+	            'sprite': r['sprites']['front_default'],
+	            'types': [t['type']['name'] for t in r['types']]
+	        }
+	       
+        cache.set(url_pokeapi, {
+            'html': render_to_string('pokedex/pokemon_template.html', {'pokemons': pokemons}),
+            'next': next_r
+        }, 60 * 15)
+        ajax_data = {
+            'html': render_to_string('pokedex/pokemon_template.html', {'pokemons': pokemons}),
+            'next': next_r
         }
 
-    template_context = {
-        'pokemons': poke
-    }
-
-    html = render_to_string('pokedex/pokemon_template.html', template_context)
-
-    ajax_data = {
-        'html': html,
-        'next': next_r
-    }
     return JsonResponse(ajax_data)
+
