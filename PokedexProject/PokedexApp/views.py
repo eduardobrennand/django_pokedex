@@ -29,7 +29,7 @@ def index(request):
         r = session.get(url).json()
         pokemons[r['name']] = {
             'id': r['id'],
-            'height': r['height'],
+            'height': r['height']/10,
             'weight': int(r['weight'])/10,
             'sprite': r['sprites']['front_default'],
             'types': [t['type']['name'] for t in r['types']]
@@ -64,7 +64,7 @@ def load_pokemons(request):
         	r = session.get(url).json()
         	pokemons[r['name']] = {
 	            'id': r['id'],
-	            'height': r['height'],
+	            'height': r['height']/10,
 	            'weight': int(r['weight'])/10,
 	            'sprite': r['sprites']['front_default'],
 	            'types': [t['type']['name'] for t in r['types']]
@@ -80,4 +80,27 @@ def load_pokemons(request):
         }
 
     return JsonResponse(ajax_data)
+
+def search_pokemon(request):
+	search_input = request.GET.get('searchInput')
+	url_pokeapi = f"https://pokeapi.co/api/v2/pokemon/{search_input}"
+
+	r = requests.get(url_pokeapi).json()
+
+	pokemon = {}
+
+	pokemon[r['name']] = {
+		'id': r['id'],
+        'height': r['height']/10,
+        'weight': int(r['weight'])/10,
+        'sprite': r['sprites']['front_default'],
+        'types': [t['type']['name'] for t in r['types']]
+	}
+
+	ajax_data = {
+		'html': render_to_string('pokedex/pokemon_template.html', {'pokemons': pokemon})
+	}
+
+	return JsonResponse(ajax_data)
+
 

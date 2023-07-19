@@ -21,5 +21,6 @@ from PokedexApp import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    path('load_pokemons/', views.load_pokemons, name='load_pokemons')
+    path('load_pokemons/', views.load_pokemons, name='load_pokemons'),
+    path('search_pokemon/', views.search_pokemon, name='search_pokemon')
 ]

@@ -12,7 +12,15 @@
 </head>
 <body>
 	<div class="pokedex-main" id="pokedex-main">
-		<h1> Pokedex </h1>
+		<div class="title"><h1> Pokedex </h1></div>
+		
+		<div class="search-div">
+			<input class="search-input" type="text" placeholder="Search pokemon">
+			<div class="search-btns">
+				<img class="search-filter" src="static/img/search.png" onclick="searchPokemon()"/>
+				<img class="search-filter" src="static/img/filter.png"/>
+			</div>
+		</div>
 		<div class="table" id="pokedex-table">
 			<div class="row header">
 				<div class="cell-header">Photo</div>
@@ -22,20 +30,36 @@
 				<div class="cell-header">Height</div>
 				<div class="cell-header">Weight</div>
 			</div>
-			{% for pokemon_name, pokemon_data in pokemons.items %}
-			<div class="row">
-				<div class="cell"><img src="{{pokemon_data.sprite}}" alt="{{pokemon_name | capfirst}}"></div>
-				<div class="cell">{{pokemon_data.id}}</div>
-				<div class="cell">{{pokemon_name | capfirst}}</div>
-				<div class="cell">{{pokemon_data.types | join:", " }}</div>
-				<div class="cell">{{pokemon_data.height}} cm</div>
-				<div class="cell">{{pokemon_data.weight}} kg</div>
+			<div id="pokedex-rows">
+				{% for pokemon_name, pokemon_data in pokemons.items %}
+				<div class="row">
+					<div class="cell"><img src="{{pokemon_data.sprite}}" alt="{{pokemon_name | capfirst}}"></div>
+					{% if pokemon_data.id < 10 %}
+						<div class="cell">#000{{pokemon_data.id}}</div>
+					{% elif pokemon_data.id < 100 %}
+						<div class="cell">#00{{pokemon_data.id}}</div>
+					{% elif pokemon_data.id < 1000 %}
+						<div class="cell">#0{{pokemon_data.id}}</div>
+					{% else %}
+						<div class="cell">#{{pokemon_data.id}}</div>
+					{% endif %}
+					<div class="cell name">{{pokemon_name | capfirst}}</div>
+					<div class="cell column">
+						{% for type in pokemon_data.types %}
+							<span class="type {{type}}">{{type | upper}}&nbsp</span>
+						{% endfor %}
+					</div>
+					<div class="cell">{{pokemon_data.height}} m</div>
+					<div class="cell">{{pokemon_data.weight}} kg</div>
+				</div>
+				{% endfor %}
 			</div>
-			{% endfor %}
 		</div>
-
+		<span class="not-found" id="not-found">Pokemon not found. Please try again.</span>
 		<img id="loading-gif" src="static/img/pokeball_loading.gif" style="width: 100px; display: none;">
-		<button class="load-button" id="load-button" type="button" onclick="loadMore(url='{{next}}')"> Load more </button>
+		<button class="load button" id="load-button" type="button" onclick="loadMore(url='{{next}}')"> Load more </button>
+		<button class="return button" id="return-button" type="button" onclick="location.href='{% url 'index' %}'"
+> Return </button>
 	</div>
 </body>
 </html>
