@@ -18,7 +18,7 @@
 			<input class="search-input" type="text" placeholder="Search pokemon">
 			<div class="search-btns">
 				<img class="search-filter" src="static/img/search.png" onclick="searchPokemon()"/>
-				<img class="search-filter" src="static/img/filter.png"/>
+				<img class="search-filter" src="static/img/filter.png" onclick="openFilter()"/>
 			</div>
 		</div>
 		<div class="table" id="pokedex-table">
@@ -58,8 +58,23 @@
 		<span class="not-found" id="not-found">Pokemon not found. Please try again.</span>
 		<img id="loading-gif" src="static/img/pokeball_loading.gif" style="width: 100px; display: none;">
 		<button class="load button" id="load-button" type="button" onclick="loadMore(url='{{next}}')"> Load more </button>
-		<button class="return button" id="return-button" type="button" onclick="location.href='{% url 'index' %}'"
-> Return </button>
-	</div>
+		<button class="return button" id="return-button" type="button" onclick="location.href='{% url 'index' %}'"> Return </button>
+
+		<div id="filter-modal" class="modal">
+			<div class="modal-content">
+				<span class="filter-close">&times;</span>
+				<div class="filter-types">
+					{% for type in types%}
+					<div class="filter-checkbox">
+						<input name="type-checkbox" type="checkbox" id="{{type}}" value="{{type}}">
+						<label for="{{type}}" class="type {{type}}">{{type | upper}}</label><br>
+					</div>
+					{% endfor %}
+				</div>
+				<div class="filter-btns">
+					<button id="filter-button" class="load button" type="button" onclick="applyFilter()">Apply Filter</button>
+				</div>
+			</div>  
+		</div>
 </body>
 </html>
